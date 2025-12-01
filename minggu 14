@@ -1,0 +1,34 @@
+# --- PENGOLAHAN (REGIONAL - RESIDUAL) ---
+st.subheader("2. Pemisahan Regional-Residual")
+
+if T_obs is None:
+st.stop()
+
+# Isi NaN dengan nearest value agar filter tidak rusak
+# (Opsional: hanya untuk visualisasi filter)
+from scipy.interpolate import NearestNDInterpolator
+mask_nan = np.isnan(T_obs)
+if np.any(mask_nan):
+    # Interpolasi ulang hanya bagian NaN dengan nearest untuk proses filter
+    mask_valid = ~mask_nan
+    xx_valid, yy_valid = X[mask_valid], Y[mask_valid]
+    zz_valid = T_obs[mask_valid]
+    interp_nn = NearestNDInterpolator(list(zip(xx_valid, yy_valid)), zz_valid)
+    T_filled = interp_nn(X, Y)
+else:
+    T_filled = T_obs
+
+method = st.selectbox("Metode Pemisahan:", ["2D Moving Average", "Trend Surface Analysis"])
+Calculated_Regional = np.zeros_like(T_obs)
+
+if method == "2D Moving Average":
+    window_pts = st.slider("Lebar Window (Grid Points)", 3, 200, 9, step=2)
+    st.caption(f"Lebar fisik window ≈ {window_pts * cell_size:.1f} meter")
+    Calculated_Regional = uniform_filter(T_filled, size=window_pts, mode='nearest')
+
+elif method == "Trend Surface Analysis":
+    poly_order = st.radio("Orde:", [1, 2], horizontal=True)
+    poly_func = polyfit2d(X, Y, T_obs, order=poly_order) # Pakai T_obs asli (bisa ada NaN)
+    Calculated_Regional = poly_func(X, Y)
+    
+Calculated_Residual = T_obs - Calculated_Regional
