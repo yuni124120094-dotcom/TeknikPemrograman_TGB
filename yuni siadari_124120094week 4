@@ -1,0 +1,57 @@
+# ===============================
+# 1️⃣ Load data dari file txt
+# ===============================
+import csv
+
+input_file = "twt_data.txt"
+data = []
+
+try:
+    with open(input_file, "r") as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            try:
+                # Konversi nilai numerik ke integer
+                shot = int(row["shot"])
+                receiver = int(row["receiver"])
+                twt = float(row["twt"])
+                data.append({"shot": shot, "receiver": receiver, "twt": twt})
+            except ValueError as ve:
+                print(f"Warning: Tidak bisa konversi baris {row} - {ve}")
+except FileNotFoundError:
+    print(f"File {input_file} tidak ditemukan!")
+    data = []
+
+# ===============================
+# 2️⃣ Normalisasi TWT
+# ===============================
+# Asumsi normalisasi: (twt - twt_min) / (twt_max - twt_min)
+try:
+    twt_values = [d["twt"] for d in data]
+    twt_min = min(twt_values)
+    twt_max = max(twt_values)
+
+    if twt_max == twt_min:
+        raise ZeroDivisionError("Semua nilai TWT sama, normalisasi tidak bisa dilakukan.")
+
+    for d in data:
+        d["twt_normalized"] = (d["twt"] - twt_min) / (twt_max - twt_min)
+
+except ValueError:
+    print("Data TWT kosong, normalisasi gagal.")
+except ZeroDivisionError as zde:
+    print(zde)
+
+# ===============================
+# 3️⃣ Simpan data ke file CSV baru
+# ===============================
+output_file = "twt_data_normalized.txt"
+
+with open(output_file, "w", newline="") as f:
+    fieldnames = ["shot", "receiver", "twt", "twt_normalized"]
+    writer = csv.DictWriter(f, fieldnames=fieldnames)
+    writer.writeheader()
+    for d in data:
+        writer.writerow(d)
+
+print(f"Data berhasil disimpan ke {output_file}")
