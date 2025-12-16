@@ -1,0 +1,32 @@
+from abc import ABC, abstractmethod
+
+# Abstract base class
+class Survey(ABC):
+    def __init__(self, name):
+        self.name = name
+
+    @abstractmethod
+    def processing(self):
+        """Each survey type must implement its own processing logic."""
+        pass
+
+# Concrete subclasses
+class SeismicSurvey(Survey):
+    def processing(self):
+        return f"{self.name}: Performing seismic signal filtering."
+class GravitySurvey(Survey):
+    def processing(self):
+        return f"{self.name}: Performing upward continuation on gravity data."
+class MagnetikSurvey(Survey):
+    def processing(self):
+        return f"{self.name}: Mapping magnetic anomalies."
+
+# Example usage
+surveys = [
+    SeismicSurvey("Seismic Survey 1"),
+    GravitySurvey("Gravity Survey 1"),
+    MagnetikSurvey("Magnetic Survey 1")
+]
+
+for survey in surveys:
+    print(survey.processing())
