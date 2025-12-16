@@ -12,4 +12,4 @@ rata_rata = total_usia / jumlah_anggota
 
 print("\nJumlah anggota keluarga:", jumlah_anggota)
 print("Total usia:", total_usia)
-print("Rata-rata usia keluarga:", rata_rata)
+print("Rata-rata usia keluarga:", rata_rata
