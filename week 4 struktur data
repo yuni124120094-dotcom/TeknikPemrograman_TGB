@@ -1,0 +1,27 @@
+trace_bad = []
+for survey_name, daftar_trace in survey.items():
+  for trace in daftar_trace:
+    if trace["QC_flag"] == "BAD":
+      trace_bad.append(trace["trace_id"])
+
+print("Trace BAD:", trace_bad)
+
+total_trace = sum(len(daftar_trace) for daftar_trace in survey.values())
+print("Total trace:", total_trace)
+
+survey_terbanyak = max(survey, key=lambda s: len(survey[s]))
+print("Survey dengan trace terbanyak:", survey_terbanyak, "(", len(survey[survey_terbanyak]), "trace )")
+
+receiver_unik = set()
+for daftar_trace in survey.values():
+  for trace in daftar_trace:
+    receiver_unik.add(trace["receiver"])
+print("Receiver unik:", receiver_unik)
+
+jumlah_receiver = {}
+for daftar_trace in survey.values():
+  for trace in daftar_trace:
+      r = trace["receiver"]
+      jumlah_receiver[r] = jumlah_receiver.get(r, 0) + 1
+
+print("Jumlah trace per receiver:", jumlah_receiver)
